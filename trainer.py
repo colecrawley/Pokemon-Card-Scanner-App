@@ -38,7 +38,7 @@ def visualize_generator_samples(data_generator, label_to_card_id, num_samples=5)
         card_id = label_to_card_id.get(label_index, "Unknown")  # Get card ID
 
         plt.subplot(1, num_samples, i + 1)
-        plt.imshow(image.astype(np.uint8))  # Ensure image is in valid display range
+        plt.imshow(image.astype(np.uint8))  
         plt.title(f"Label: {label_index}\nCard ID: {card_id}")
         plt.axis('off')
 
@@ -52,7 +52,7 @@ def check_generator_output(generator, label_to_card_id, num_batches=5, num_sampl
         unique_classes = np.unique(np.argmax(batch_labels, axis=1))
         print(f"Batch {i+1}: {len(unique_classes)} unique labels -> {unique_classes}")
 
-        # Select a random subset of samples
+        # Select random subset of samples
         indices = np.random.choice(len(batch_images), num_samples, replace=False)
         sample_images = batch_images[indices]
         sample_labels = batch_labels[indices]
@@ -68,7 +68,7 @@ def load_and_link_data(limit=None):
         if file_name.endswith('.csv'):
             set_data = pd.read_csv(os.path.join(combined_data_folder, file_name))
             for _, row in set_data.iterrows():
-                # Ensure 'set' and 'name' are strings before creating the image path
+                # Ensuring 'set' and 'name' are strings before creating the image path
                 image_path = os.path.join(images_folder, str(row['set']), f"{str(row['name'])}.jpg")
                 if os.path.exists(image_path):
                     card_info.append({
@@ -141,7 +141,7 @@ def plot_set_distribution(df, title="Set Distribution", highlight_sets=None):
 
     plt.figure(figsize=(14, 6))
     
-    # Highlight sets
+    # Highlighting the sets
     colors = ['red' if set_name in highlight_sets else 'blue' for set_name in set_counts.index]
     
     sns.barplot(x=set_counts.index, y=set_counts, palette=colors)
@@ -158,7 +158,7 @@ def plot_set_distribution(df, title="Set Distribution", highlight_sets=None):
 def find_set_statistics(df):
     """Finds the smallest, largest, and middle set based on card count, and calculates the average."""
     set_counts = df['set'].value_counts()
-    avg_cards_per_set = int(set_counts.mean())  # Ensure average is correctly calculated
+    avg_cards_per_set = int(set_counts.mean())  
     
     smallest_set = set_counts.idxmin()
     largest_set = set_counts.idxmax()
@@ -171,30 +171,30 @@ def find_set_statistics(df):
     print(f"⚖️ Middle Set (Closest to Average): {middle_set} ({set_counts[middle_set]} cards)")
     print(f"🔢 Average Cards Per Set: {avg_cards_per_set}")
 
-    return smallest_set, largest_set, middle_set, avg_cards_per_set  # Return all statistics
+    return smallest_set, largest_set, middle_set, avg_cards_per_set 
 
 
 def oversample_below_middle(df):
     """Oversamples sets that have fewer than the middle set, ensuring the average remains the same."""
-    # Access original card counts and calculate statistics
+    # get original card counts and calculate statistics
     smallest_set, largest_set, middle_set, avg_cards_per_set = find_set_statistics(df)
     
     print("\n🔍 Checking set distribution BEFORE oversampling...")
     plot_set_distribution(df, "Set Distribution Before Oversampling", highlight_sets=[smallest_set, largest_set, middle_set])
     
-    # Save the original counts before oversampling
+    # save the original counts before oversampling
     original_counts = df['set'].value_counts()
     
-    # Oversample the sets with fewer cards than the original middle set
+    # Oversample the sets with fewer cards than the average set
     set_counts = df['set'].value_counts()
     below_middle_sets = original_counts[original_counts < set_counts[middle_set]].index
 
-    # Oversample only those sets
+    
     oversampled_df = df.copy()
     
     for set_name in below_middle_sets:
         set_size = set_counts[set_name]
-        # Calculate the number of additional samples needed to match the middle set size
+        # Calculating the number of additional samples needed to match the middle set size
         additional_samples = set_counts[middle_set] - set_size
         if additional_samples > 0:
             # Get the samples from this set
@@ -202,13 +202,13 @@ def oversample_below_middle(df):
             # Add those samples to the dataframe
             oversampled_df = pd.concat([oversampled_df, samples_to_add], ignore_index=True)
 
-    # After oversampling, recalculate the set statistics
+    # recalulating the stats
     smallest_set, largest_set, middle_set, avg_cards_per_set = find_set_statistics(oversampled_df)
     
     print("\n✅ Checking set distribution AFTER oversampling...")
     plot_set_distribution(oversampled_df, "Set Distribution After Oversampling", highlight_sets=[smallest_set, largest_set, middle_set])
     
-    # Ensure that after oversampling, the average is maintained and larger sets are unchanged
+    
     oversampled_set_counts = oversampled_df['set'].value_counts()
     oversampled_avg = oversampled_set_counts.mean()
     
