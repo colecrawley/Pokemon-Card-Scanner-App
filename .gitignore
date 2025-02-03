@@ -1,0 +1,10 @@
+# Ignore the entire dataset folder
+/images/
+
+# ignore any large dataset-specific files, such as CSVs or other formats
+/combined_data/
+
+# Optionally, ignore other common large files or folders
+*.log
+*.tmp
+*.bak
