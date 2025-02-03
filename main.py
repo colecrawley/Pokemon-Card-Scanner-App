@@ -10,7 +10,7 @@ from trainer import (
     train_model,
     load_and_link_data,
     preprocess_image,
-    create_id_mapping,  # Ensure this is imported from trainer.py
+    create_id_mapping, 
 )
 
 
@@ -18,7 +18,7 @@ def predict_card(image_path, model_path="pokemon_mobilenet.h5", id_mapping=None,
     """
     Predict the top N Pokémon card IDs using the trained model.
     """
-    # Check if the model exists
+    
     if not os.path.exists(model_path):
         print(f"Model not found at {model_path}. Training a new model...")
         train_model()
@@ -31,17 +31,17 @@ def predict_card(image_path, model_path="pokemon_mobilenet.h5", id_mapping=None,
     reverse_mapping = {v: k for k, v in id_mapping.items()}
 
     # Preprocess the image
-    image_data = preprocess_image(image_path)  # Ensure this outputs (1, 224, 224, 3)
+    image_data = preprocess_image(image_path)  # Ensuring this outputs (1, 224, 224, 3)
 
-    # Make prediction
+    # prediction
     predictions = model.predict(image_data)
 
     # Get top N predictions
-    top_n_indices = np.argsort(predictions[0])[-top_n:][::-1]  # Indices of the top N probabilities
-    top_n_probabilities = predictions[0][top_n_indices]  # Probabilities of the top N
+    top_n_indices = np.argsort(predictions[0])[-top_n:][::-1]  # Indices of top N probabilities
+    top_n_probabilities = predictions[0][top_n_indices]  # Probabilities of top N
     top_n_labels = [reverse_mapping.get(idx, "Unknown") for idx in top_n_indices]  # Get card IDs
 
-    # Display the top N predictions
+    # Showing the top N predictions
     print(f"Top {top_n} Predictions:")
     for i in range(top_n):
         print(f"{i+1}. Card ID: {top_n_labels[i]} with probability: {top_n_probabilities[i]:.4f}")
